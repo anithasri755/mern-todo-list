@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path'); // Import path for serving files
 require('dotenv').config(); // Load environment variables from .env file
 
 // Create an instance of express
@@ -8,14 +9,13 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+// Serve favicon.ico from the root folder
+app.use('/favicon.ico', express.static(path.join(__dirname, 'favicon.ico')));
+
 // Connecting to MongoDB using environment variable
 mongoose.connect(process.env.MONGODB_URL)
-  .then(() => {
-    console.log('DB connected!');
-  })
-  .catch((err) => {
-    console.error('DB connection error:', err);
-  });
+  .then(() => console.log('DB connected!'))
+  .catch((err) => console.error('DB connection error:', err));
 
 // Creating schema with createdAt
 const todoSchema = new mongoose.Schema({
@@ -81,6 +81,11 @@ app.delete('/todos/:id', async (req, res) => {
     console.error(error);
     res.status(500).json({ message: error.message });
   }
+});
+
+// Add a route for the homepage
+app.get('/', (req, res) => {
+  res.send('Welcome to the MERN Todo List API!');
 });
 
 // Start the server using environment variable PORT
