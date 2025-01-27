@@ -1,21 +1,27 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const path = require('path'); // Import path for serving files
-require('dotenv').config(); // Load environment variables from .env file
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+require("dotenv").config(); // Load environment variables from .env file
 
 // Create an instance of express
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-// Serve favicon.ico from the root folder
-app.use('/favicon.ico', express.static(path.join(__dirname, 'favicon.ico')));
+// Example route
+app.get("/", (req, res) => {
+  res.send("Hello, this is your backend!");
+});
+
+app.get("/api", (req, res) => {
+  res.json({ message: "Welcome to your API!" });
+});
 
 // Connecting to MongoDB using environment variable
-mongoose.connect(process.env.MONGODB_URL)
-  .then(() => console.log('DB connected!'))
-  .catch((err) => console.error('DB connection error:', err));
+mongoose
+  .connect(process.env.MONGODB_URL)
+  .then(() => console.log("DB connected!"))
+  .catch((err) => console.error("DB connection error:", err));
 
 // Creating schema with createdAt
 const todoSchema = new mongoose.Schema({
@@ -25,10 +31,10 @@ const todoSchema = new mongoose.Schema({
 });
 
 // Creating Model
-const todoModel = mongoose.model('Todo', todoSchema);
+const todoModel = mongoose.model("Todo", todoSchema);
 
 // Create a new todo item
-app.post('/todos', async (req, res) => {
+app.post("/todos", async (req, res) => {
   const { title, description } = req.body;
   try {
     const newTodo = new todoModel({ title, description });
@@ -41,7 +47,7 @@ app.post('/todos', async (req, res) => {
 });
 
 // Get all items
-app.get('/todos', async (req, res) => {
+app.get("/todos", async (req, res) => {
   try {
     const todos = await todoModel.find();
     res.json(todos);
@@ -52,7 +58,7 @@ app.get('/todos', async (req, res) => {
 });
 
 // Update item
-app.put('/todos/:id', async (req, res) => {
+app.put("/todos/:id", async (req, res) => {
   try {
     const { title, description } = req.body;
     const id = req.params.id;
@@ -62,7 +68,7 @@ app.put('/todos/:id', async (req, res) => {
       { new: true } // Return the updated document
     );
     if (!updatedTodo) {
-      return res.status(404).json({ message: 'Todo not found' });
+      return res.status(404).json({ message: "Todo not found" });
     }
     res.json(updatedTodo);
   } catch (error) {
@@ -72,7 +78,7 @@ app.put('/todos/:id', async (req, res) => {
 });
 
 // Delete item
-app.delete('/todos/:id', async (req, res) => {
+app.delete("/todos/:id", async (req, res) => {
   try {
     const id = req.params.id;
     await todoModel.findByIdAndDelete(id);
@@ -83,13 +89,10 @@ app.delete('/todos/:id', async (req, res) => {
   }
 });
 
-// Add a route for the homepage
-app.get('/', (req, res) => {
-  res.send('Welcome to the MERN Todo List API!');
-});
-
 // Start the server using environment variable PORT
 const port = process.env.PORT || 8000;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
+module.exports = app;
