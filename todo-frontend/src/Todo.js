@@ -23,7 +23,9 @@ export default function Todo() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [editId, setEditId] = useState(-1);
-  const apiUrl = "http://localhost:8000";
+  
+   // Use environment variable for API URL
+   const apiUrl = process.env.REACT_APP_API_URL;
 
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
